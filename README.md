@@ -25,21 +25,22 @@ To get set up for this lesson, please:
 - Replace the existing `<App>` component with this starting code:
 
 	```js
-	class App extends React.Component {
-	  state = {
+	function App() {
+	 
+	const [state, setState] = useState({
 	    skills: [{ skill: "JavaScript", level: 4 }]
-	  };
+	   )}
 	
-	  addSkill = () => {
+	  const addSkill = () => {
 	    alert("ADD SKILL CLICKED");
 	  };
 	
-	  render() {
+	
 	    return (
 	      <section>
 	        <h2>DEV SKILLS</h2>
 	        <hr />
-	        {this.state.skills.map(s => (
+	        {state.skills.map(s => (
 	          <article key={s.skill}>
 	            <div>{s.skill}</div> <div>{s.level}</div>
 	          </article>
@@ -60,15 +61,14 @@ To get set up for this lesson, please:
 	              <option value="5">5</option>
 	            </select>
 	          </label>
-	          <button onClick={this.addSkill}>ADD SKILL</button>
+	          <button onClick={addSkill}>ADD SKILL</button>
 	        </form>
 	      </section>
 	    );
 	  }
-	}
 	```
 
-- Let's make it look okay by replacing the contents of **styles.css** with:
+- Let's make it look okay by replacing the contents of **App.css** with:
 		
 	```css
 	* {
@@ -185,13 +185,13 @@ React "controlled" inputs have their value assigned to them via the `value` prop
 
 So for our Dev Skills app, if the `<input>` & `<select>` inputs currently in `<App>` are going to get their values from `state`, we're going to need to add two new properties to `state` dedicated to maintaining the "state" of each input:
 
-```js
-state = {
-  skills: [{ skill: "JavaScript", level: 4 }],
-  // New state for the inputs below
-  skill: "",
-  level: 3
-};
+```js  
+  const [state, setState] = useState({
+	    skills: [{ skill: "JavaScript", level: 4 }],
+	    skill: "",
+	    level: 3
+   )}
+  
 ```
 
 Notice that we intend to initialize the value of the `<select>` for the skills's `level` to `3`.
@@ -200,13 +200,13 @@ Now, we can "connect" those state properties to their respective inputs using th
 
 ```html
   ...
-  {/* Connect the input to state.skill */}
-  <input name="skill" value={this.state.skill} />
+  {/* Connect the input to state skill */}
+  <input name="skill" value={state.skill} />
 </label>
 <label>
   <span>LEVEL</span>
-  {/* Connect the select to state.level */}
-  <select name="level" value={this.state.level}>
+  {/* Connect the select to state level */}
+  <select name="level" value={state.level}>
   ...
 ```
 
@@ -230,9 +230,9 @@ First add an `onChange` prop to the `<input>`:
 <span>SKILL</span>
 <input
   name="skill"
-  value={this.state.skill}
+  value={state.skill}
   {/* Add an event handler */}
-  onChange={this.handleChange}
+  onChange={handleChange}
 />
 ```
 
@@ -242,8 +242,8 @@ Now add the `handleChange` method that will be called every time a character is 
 
 ```js
 // Add the onChange event handler
-handleChange = e => {
-  this.setState({ skill: e.target.value });
+const handleChange = e => {
+  setState({...state, skill: e.target.value})
 };
 
 render() {
@@ -276,8 +276,8 @@ Okay, let's add the event handler to the `<select>`:
 ```js
 <select
   name="level"
-  value={this.state.level}
-  onChange={this.handleChange}
+  value={state.level}
+  onChange={handleChange}
 >
 ```
 
@@ -296,25 +296,12 @@ Currently however, the `skill` and `level` properties on `state` are not isolate
 
 Do the following refactor:
 
-1. Move the `skill` & `level` properties to a `newSkill` object on `state`. When finished with this step, `state` will have just two top level properties: `skills` (the array of skills entered) & `newSkill` (the object linked to the inputs for adding a new skill).
 
-	> Hint: You will also need to update the `value` props of the inputs.
+1. We want to modify the state so that we have a skills array and a newSkills object that contains the value from the skills and level inputs. Instead of having the skill and level properties on their own, we want to store them inside of a newSkill object inside the state. To do this, lets create two different hooks for the state, once for the skills array, and one for the newSkill object (i.e. [skills, setSkills] and also [newSkill, setNewSkill]).
 
-2. Update the `handleChange` method so that it replaces, not mutates, the `newSkill` object when either `skill` or `level` are being changed.
+	> Hint: You will also need to update the `value` props of the inputs. 
 
-	> Hint: React's synthetic event object will not be available inside of the function provided to `setState`...
-	
-	```js
-	handleChange = e => {
-	  // The synthetic event's target property, is available here...
-	  console.log(e.target);  // the input gets logged out
-	  this.setState(state => {
-	    // But not available here...
-	    console.log(e.target);  // null :(
-	  });
-	};
-	```
-	The solution is to either call `e.persist();`, or create your new replacement object before the call to `setState` and use that object within the function provided to `setState`.
+2. Update the `handleChange` method so that the `newSkill` object in our state reflects the values of both the `skill` and `level` inputs when changed 
 
 When finished, be sure to test it out by changing both inputs.	
 ## Adding the New Skill to State
@@ -334,14 +321,11 @@ Let's ignore the **[ADD SKILL]** button for a moment, and write the code to add 
 We'll review as we type the new code in the `addSkill` method:
 
 ```js
-addSkill = () => {
-  // Using the "function" approach because relying on existing state
-  this.setState(state => ({
-    // Always replace, don't mutate top-level state properties
-    skills: [...state.skills, state.newSkill],
+const addSkill = () => {
+    // Always replace, don't mutate top-level state properties    
+   	setSkills([...skills, newSkill])
     // Reset the inputs for better UX
-    newSkill: {skill: '', level: 3}
-  }));
+    	setNewSkill({skill: "", level: 3})
 };
 ```
 
@@ -369,7 +353,7 @@ However, despite those missing attributes, and despite the fact that the **[ADD 
 In React, we need to prevent the browser from submitting forms and we first do this by **always** using the `onSubmit` prop on `<form>` components:
 
 ```js
-<form onSubmit={this.addSkill}>
+<form onSubmit={addSkill}>
 ```
 
 Then, **always** calling the event object's `preventDefault` method straightaway:
