@@ -297,7 +297,7 @@ Currently however, the `skill` and `level` properties on `state` are not isolate
 Do the following refactor:
 
 
-1. We want to modify the state so that we have a skills array and a newSkills object that contains the value from the skills and level inputs. Instead of having the skill and level properties on their own, we want to store them inside of a newSkill object inside the state. To do this, lets create two different hooks for the state, once for the skills array, and one for the newSkill object (i.e. [skills, setSkills] and also [newSkill, setNewSkill]).
+1. We want to modify the state so that we have a skills array and a newSkills object that contains the value from the skills and level inputs. Instead of having the skill and level properties on their own, we want to store them inside of a newSkill object inside the state. To do this, lets create two different hooks for the state, one for the skills array, and one for the newSkill object (i.e. [skills, setSkills] and also [newSkill, setNewSkill]).
 
 	> Hint: You will also need to update the `value` props of the inputs. 
 
