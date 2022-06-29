@@ -29,7 +29,7 @@ To get set up for this lesson, please:
 	 
 	const [state, setState] = useState({
 	    skills: [{ skill: "JavaScript", level: 4 }]
-	   )}
+	   })
 	
 	  const addSkill = () => {
 	    alert("ADD SKILL CLICKED");
